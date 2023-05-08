@@ -102,8 +102,7 @@
 #define INTERRUPT_HANDLER j other_exception /* No interrupts should occur */
 
 #define RVTEST_CODE_BEGIN                                               \
-        .section .text.init;                                            \
-        .org 0xC0, 0x00;                                                \
+        .section .text.init;                                                                                         \
         .balign  64;                                                    \
         .weak stvec_handler;                                            \
         .weak mtvec_handler;                                            \
@@ -133,6 +132,7 @@ _report:                                                                \
         j sc_exit;                                                      \
         .balign  64;                                                    \
         .globl _start;                                                  \
+.section .text.start; 							\
 _start:                                                                 \
         RISCV_MULTICORE_DISABLE;                                        \
         /*INIT_SPTBR;*/                                                 \
