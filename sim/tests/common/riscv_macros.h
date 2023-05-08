@@ -102,7 +102,10 @@
 #define INTERRUPT_HANDLER j other_exception /* No interrupts should occur */
 
 #define RVTEST_CODE_BEGIN                                               \
-        .section .text.init;                                                                                         \
+	.org 0x600, 0;							\
+	MSG_TRAP:							\
+	.string "break-break";						\
+        .section .text.init;             	    			\
         .balign  64;                                                    \
         .weak stvec_handler;                                            \
         .weak mtvec_handler;                                            \
@@ -115,6 +118,15 @@ trap_vector:                                                            \
         beq a4, a5, _report;                                            \
         li a5, CAUSE_MACHINE_ECALL;                                     \
         beq a4, a5, _report;                                            \
+        lui a6, 0xf0000;						\
+        la a7, MSG_TRAP;						\
+next_iter:								\
+	lb a5, 0(a7);							\
+        beq a5, x0, break_from_loop;					\
+        sw a5, 0(a6);							\
+        addi a7, a7, 1;							\
+        jal x0, next_iter;						\
+break_from_loop:							\
         /* if an mtvec_handler is defined, jump to it */                \
         la a4, mtvec_handler;                                           \
         beqz a4, 1f;                                                    \
